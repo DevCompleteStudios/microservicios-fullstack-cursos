@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -44,11 +45,24 @@ public class CursoController extends CommonController<Curso, CursoService> {
     @PutMapping("/{id}/eliminar-alumno")
     public ResponseEntity<?> eliminarAlumno(@PathVariable Long id, @RequestBody Alumno alumno){
         Optional<Curso> c = this.service.findById(id);
-        if(c.isEmpty()) return ResponseEntity.notFound().build();
+        if(c.isEmpty()){
+            System.out.println("No viene");
+            return ResponseEntity.notFound().build();
+        }
+
+        System.out.println("Alumno id: " + alumno.getId());
 
         Curso cursoDb = c.get();
         cursoDb.remove(alumno);
         return ResponseEntity.status(201).body(this.service.save(cursoDb));
     }
 
+
+    @GetMapping("/alumno/{id}")
+    public ResponseEntity<?> findCursoByUserId(@PathVariable Long id){
+        Optional<Curso> curso = this.service.findCursoByUserId(id);
+        if( curso.isEmpty() ) return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(curso.get());
+    }
 }
