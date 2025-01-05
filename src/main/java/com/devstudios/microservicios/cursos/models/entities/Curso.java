@@ -4,9 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.aspectj.weaver.ast.Instanceof;
-import org.springframework.web.method.annotation.AbstractCookieValueMethodArgumentResolver;
-
+import com.devstudios.microservicios.commons.examenes.entities.Examen;
 import com.microservicio.commons.alumnos.models.entities.Alumno;
 
 import jakarta.persistence.Column;
@@ -15,6 +13,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
@@ -38,6 +37,9 @@ public class Curso {
 
     @OneToMany(fetch=FetchType.LAZY)
     private List<Alumno> alumnos = new ArrayList<>();
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Examen> examenes = new ArrayList<>();
 
 
     public Long getId() {
@@ -70,6 +72,19 @@ public class Curso {
     public void remove(Alumno alumno) {
         this.alumnos.remove(alumno);
     }
+    public List<Examen> getExamenes() {
+        return examenes;
+    }
+    public void setExamenes(List<Examen> examenes) {
+        this.examenes = examenes;
+    }
+    public void addExamen(Examen examen) {
+        this.examenes.add(examen);
+    }
+    public void removeExamen(Examen examen) {
+        this.examenes.remove(examen);
+    }
+
 
     @Override
     public int hashCode() {
