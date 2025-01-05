@@ -1,9 +1,12 @@
 package com.devstudios.microservicios.cursos.controllers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -16,6 +19,8 @@ import com.devstudios.microservicios.cursos.models.entities.Curso;
 import com.devstudios.microservicios.cursos.services.CursoService;
 import com.microservicio.commons.alumnos.models.entities.Alumno;
 
+import jakarta.validation.Valid;
+
 
 
 
@@ -23,7 +28,9 @@ import com.microservicio.commons.alumnos.models.entities.Alumno;
 public class CursoController extends CommonController<Curso, CursoService> {
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editar( @PathVariable Long id, @RequestBody Curso curso ){
+    public ResponseEntity<?> editar( @PathVariable Long id, @Valid @RequestBody Curso curso, BindingResult result ){
+        if( result.hasErrors() ) return validar(result);
+
         Optional<Curso> c = this.service.findById(id);
         if(c.isEmpty()) return ResponseEntity.notFound().build();
 
@@ -44,7 +51,8 @@ public class CursoController extends CommonController<Curso, CursoService> {
     }
 
     @PutMapping("/{id}/eliminar-alumno")
-    public ResponseEntity<?> eliminarAlumno(@PathVariable Long id, @RequestBody Alumno alumno){
+    public ResponseEntity<?> eliminarAlumno(@PathVariable Long id, @Valid @RequestBody Alumno alumno, BindingResult result){
+        if( result.hasErrors() ) return validar(result);
         Optional<Curso> c = this.service.findById(id);
         if(c.isEmpty()){
             System.out.println("No viene");
@@ -69,7 +77,8 @@ public class CursoController extends CommonController<Curso, CursoService> {
     }
 
     @PutMapping("/{id}/eliminar-examen")
-    public ResponseEntity<?> eliminarExamen(@PathVariable Long id, @RequestBody Examen examen){
+    public ResponseEntity<?> eliminarExamen(@PathVariable Long id, @Valid @RequestBody Examen examen, BindingResult result){
+        if( result.hasErrors() ) return validar(result);
         Optional<Curso> c = this.service.findById(id);
         if(c.isEmpty()){
             System.out.println("No viene");
@@ -90,5 +99,15 @@ public class CursoController extends CommonController<Curso, CursoService> {
         if( curso.isEmpty() ) return ResponseEntity.notFound().build();
 
         return ResponseEntity.ok(curso.get());
+    }
+
+
+    protected ResponseEntity<?> validar( BindingResult response ){
+        Map<String, Object> res = new HashMap<>();
+
+        response.getFieldErrors()
+            .forEach(e -> res.put(e.getField(), e.getDefaultMessage()));
+
+        return ResponseEntity.badRequest().body(res);
     }
 }
